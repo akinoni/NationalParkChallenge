@@ -76,7 +76,7 @@ export default function ParkMatchup({ park1, park2, onVoteSubmitted }: ParkMatch
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Park 1 */}
       <Card className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 ${selectedParkId === park1.id ? 'border-2 border-green-500' : ''}`}>
-        <div className="relative h-48">
+        <div className="relative h-48 sm:h-56 md:h-48 lg:h-56">
           <div className="absolute inset-0 bg-gray-200">
             {park1.image && (
               <img 
@@ -97,25 +97,25 @@ export default function ParkMatchup({ park1, park2, onVoteSubmitted }: ParkMatch
                 {park1.tag}
               </span>
             )}
-            <h3 className="text-xl font-bold text-white">{park1.name}</h3>
-            <p className="text-sm text-white/90">{park1.state}</p>
+            <h3 className="text-lg sm:text-xl font-bold text-white truncate">{park1.name}</h3>
+            <p className="text-xs sm:text-sm text-white/90 truncate">{park1.state}</p>
           </div>
         </div>
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-sm text-gray-500">Current Rank: <span className="font-bold text-gray-900">#{park1.currentRank}</span></span>
-            <span className="text-sm text-gray-500">ELO: <span className="font-bold text-gray-900">{park1.elo}</span></span>
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex justify-between items-center mb-3 sm:mb-4">
+            <span className="text-xs sm:text-sm text-gray-500">Rank: <span className="font-bold text-gray-900">#{park1.currentRank}</span></span>
+            <span className="text-xs sm:text-sm text-gray-500">ELO: <span className="font-bold text-gray-900">{park1.elo}</span></span>
           </div>
-          <div className="flex flex-col space-y-2">
-            <div className="flex justify-between text-sm">
+          <div className="flex flex-col space-y-1 sm:space-y-2">
+            <div className="flex justify-between text-xs sm:text-sm">
               <span className="text-gray-500">Annual Visitors:</span>
               <span className="font-medium">{formatNumber(park1.visitors)}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-xs sm:text-sm">
               <span className="text-gray-500">Established:</span>
               <span className="font-medium">{park1.established}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-xs sm:text-sm">
               <span className="text-gray-500">Size:</span>
               <span className="font-medium">{formatNumber(park1.size)} acres</span>
             </div>
@@ -123,12 +123,12 @@ export default function ParkMatchup({ park1, park2, onVoteSubmitted }: ParkMatch
           <Button
             onClick={() => handleVote(park1.id)}
             disabled={submitVoteMutation.isPending}
-            className={`w-full mt-4 ${selectedParkId === park1.id ? 'bg-green-600' : 'bg-green-500 hover:bg-green-600'}`}
+            className={`w-full mt-3 sm:mt-4 text-sm sm:text-base ${selectedParkId === park1.id ? 'bg-green-600' : 'bg-green-500 hover:bg-green-600'}`}
           >
             {selectedParkId === park1.id ? (
-              <Check className="h-5 w-5 mr-2" />
+              <Check className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
             ) : (
-              <ThumbsUp className="h-5 w-5 mr-2" />
+              <ThumbsUp className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
             )}
             {selectedParkId === park1.id ? 'Vote Recorded' : 'Vote For This Park'}
           </Button>
@@ -137,7 +137,7 @@ export default function ParkMatchup({ park1, park2, onVoteSubmitted }: ParkMatch
 
       {/* Park 2 */}
       <Card className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 ${selectedParkId === park2.id ? 'border-2 border-green-500' : ''}`}>
-        <div className="relative h-48">
+        <div className="relative h-48 sm:h-56 md:h-48 lg:h-56">
           <div className="absolute inset-0 bg-gray-200">
             {park2.image && (
               <img 
@@ -158,25 +158,25 @@ export default function ParkMatchup({ park1, park2, onVoteSubmitted }: ParkMatch
                 {park2.tag}
               </span>
             )}
-            <h3 className="text-xl font-bold text-white">{park2.name}</h3>
-            <p className="text-sm text-white/90">{park2.state}</p>
+            <h3 className="text-lg sm:text-xl font-bold text-white truncate">{park2.name}</h3>
+            <p className="text-xs sm:text-sm text-white/90 truncate">{park2.state}</p>
           </div>
         </div>
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-sm text-gray-500">Current Rank: <span className="font-bold text-gray-900">#{park2.currentRank}</span></span>
-            <span className="text-sm text-gray-500">ELO: <span className="font-bold text-gray-900">{park2.elo}</span></span>
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex justify-between items-center mb-3 sm:mb-4">
+            <span className="text-xs sm:text-sm text-gray-500">Rank: <span className="font-bold text-gray-900">#{park2.currentRank}</span></span>
+            <span className="text-xs sm:text-sm text-gray-500">ELO: <span className="font-bold text-gray-900">{park2.elo}</span></span>
           </div>
-          <div className="flex flex-col space-y-2">
-            <div className="flex justify-between text-sm">
+          <div className="flex flex-col space-y-1 sm:space-y-2">
+            <div className="flex justify-between text-xs sm:text-sm">
               <span className="text-gray-500">Annual Visitors:</span>
               <span className="font-medium">{formatNumber(park2.visitors)}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-xs sm:text-sm">
               <span className="text-gray-500">Established:</span>
               <span className="font-medium">{park2.established}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-xs sm:text-sm">
               <span className="text-gray-500">Size:</span>
               <span className="font-medium">{formatNumber(park2.size)} acres</span>
             </div>
@@ -185,12 +185,12 @@ export default function ParkMatchup({ park1, park2, onVoteSubmitted }: ParkMatch
             onClick={() => handleVote(park2.id)}
             disabled={submitVoteMutation.isPending}
             variant={selectedParkId === park2.id ? "default" : "outline"}
-            className={`w-full mt-4 ${selectedParkId === park2.id ? 'bg-green-600' : ''}`}
+            className={`w-full mt-3 sm:mt-4 text-sm sm:text-base ${selectedParkId === park2.id ? 'bg-green-600' : ''}`}
           >
             {selectedParkId === park2.id ? (
-              <Check className="h-5 w-5 mr-2" />
+              <Check className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
             ) : (
-              <ThumbsUp className="h-5 w-5 mr-2" />
+              <ThumbsUp className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
             )}
             {selectedParkId === park2.id ? 'Vote Recorded' : 'Vote For This Park'}
           </Button>

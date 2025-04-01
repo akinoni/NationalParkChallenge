@@ -29,9 +29,10 @@ export default function RecentVotes() {
         ) : recentVotes && recentVotes.length > 0 ? (
           <div className="space-y-3">
             {recentVotes.map((vote, index) => (
-              <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-gray-200">
+              <div key={index} className="flex flex-col sm:flex-row justify-between items-center p-3 bg-gray-50 rounded-lg gap-2 sm:gap-0">
+                {/* Winner section */}
+                <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-center sm:justify-start">
+                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-gray-200">
                     {vote.image && (
                       <img 
                         src={vote.image}
@@ -41,22 +42,29 @@ export default function RecentVotes() {
                       />
                     )}
                   </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{vote.name}</p>
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm sm:text-base text-gray-900 truncate max-w-[120px]">{vote.name}</p>
                     <p className="text-xs text-gray-500">beat</p>
                   </div>
                 </div>
-                <div className="text-center text-sm text-gray-400">
+                
+                {/* Points section - hidden on mobile */}
+                <div className="text-center text-sm text-gray-400 hidden sm:block">
                   <span className="inline-block bg-white py-1 px-2 rounded border text-xs">
                     +{vote.points || 0}
                   </span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <div>
-                    <p className="font-medium text-gray-900 text-right">{vote.loserName}</p>
-                    <p className="text-xs text-gray-500 text-right">{vote.timeSince}</p>
-                  </div>
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-gray-200">
+                
+                {/* Mobile points section */}
+                <div className="text-center text-sm text-gray-400 block sm:hidden">
+                  <span className="inline-block bg-white py-1 px-2 rounded border text-xs">
+                    +{vote.points || 0} points
+                  </span>
+                </div>
+                
+                {/* Loser section */}
+                <div className="flex flex-row-reverse sm:flex-row items-center space-x-0 sm:space-x-3 space-x-reverse sm:space-x-reverse-0 w-full sm:w-auto justify-center sm:justify-end">
+                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-gray-200">
                     {vote.loserImage && (
                       <img 
                         src={vote.loserImage}
@@ -65,6 +73,10 @@ export default function RecentVotes() {
                         onError={(e) => { e.currentTarget.style.display = 'none'; }}
                       />
                     )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm sm:text-base text-gray-900 text-right truncate max-w-[120px]">{vote.loserName}</p>
+                    <p className="text-xs text-gray-500 text-right">{vote.timeSince}</p>
                   </div>
                 </div>
               </div>

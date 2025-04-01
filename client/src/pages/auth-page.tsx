@@ -35,8 +35,9 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="container mx-auto py-10 flex flex-col md:flex-row items-center gap-8">
-      <div className="flex-1 w-full max-w-md">
+    <div className="container mx-auto py-6 sm:py-8 md:py-10 px-4 sm:px-6 flex flex-col md:flex-row items-center gap-6 sm:gap-8">
+      {/* Auth form */}
+      <div className="flex-1 w-full max-w-md order-2 md:order-1">
         <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
@@ -53,34 +54,35 @@ export default function AuthPage() {
         </Tabs>
       </div>
       
-      <div className="flex-1 w-full text-center md:text-left">
-        <h1 className="text-4xl font-bold mb-4">National Parks ELO Ranking</h1>
-        <p className="text-xl mb-6">
+      {/* App info */}
+      <div className="flex-1 w-full text-center md:text-left order-1 md:order-2 mb-6 md:mb-0">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-4">National Parks ELO Ranking</h1>
+        <p className="text-base sm:text-lg md:text-xl mb-4 sm:mb-6">
           Vote on your favorite national parks and help create the ultimate ranking!
         </p>
         
-        <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center mt-1 flex-shrink-0">1</div>
+        <div className="space-y-3 sm:space-y-4 max-w-lg mx-auto md:mx-0">
+          <div className="flex items-start gap-2 sm:gap-3">
+            <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center mt-1 flex-shrink-0 text-sm sm:text-base">1</div>
             <div>
-              <h3 className="font-semibold text-lg">Create an account</h3>
-              <p>Sign up to track your votes and personalize your experience</p>
+              <h3 className="font-semibold text-base sm:text-lg">Create an account</h3>
+              <p className="text-sm sm:text-base">Sign up to track your votes and personalize your experience</p>
             </div>
           </div>
           
-          <div className="flex items-start gap-3">
-            <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center mt-1 flex-shrink-0">2</div>
+          <div className="flex items-start gap-2 sm:gap-3">
+            <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center mt-1 flex-shrink-0 text-sm sm:text-base">2</div>
             <div>
-              <h3 className="font-semibold text-lg">Vote on matchups</h3>
-              <p>Choose between head-to-head national park battles</p>
+              <h3 className="font-semibold text-base sm:text-lg">Vote on matchups</h3>
+              <p className="text-sm sm:text-base">Choose between head-to-head national park battles</p>
             </div>
           </div>
           
-          <div className="flex items-start gap-3">
-            <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center mt-1 flex-shrink-0">3</div>
+          <div className="flex items-start gap-2 sm:gap-3">
+            <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center mt-1 flex-shrink-0 text-sm sm:text-base">3</div>
             <div>
-              <h3 className="font-semibold text-lg">View rankings</h3>
-              <p>See the most beloved national parks based on everyone's votes</p>
+              <h3 className="font-semibold text-base sm:text-lg">View rankings</h3>
+              <p className="text-sm sm:text-base">See the most beloved national parks based on everyone's votes</p>
             </div>
           </div>
         </div>
