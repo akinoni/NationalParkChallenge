@@ -1,13 +1,8 @@
 import { Link, useLocation } from "wouter";
 import { Sparkles } from "lucide-react";
-import { Dialog } from "./ui/dialog";
-import { useState } from "react";
-import Auth from "./Auth";
 
 export default function Header() {
   const [location] = useLocation();
-  const [showAuth, setShowAuth] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
 
   return (
     <header className="bg-white shadow-sm">
@@ -36,38 +31,9 @@ export default function Header() {
             >
               Vote Now
             </div>
-            <div className="flex space-x-2">
-              <button
-                className="px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900"
-                onClick={() => {
-                  setIsLogin(true);
-                  setShowAuth(true);
-                }}
-              >
-                Sign In
-              </button>
-              <button
-                className="px-3 py-2 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600"
-                onClick={() => {
-                  setIsLogin(false);
-                  setShowAuth(true);
-                }}
-              >
-                Sign Up
-              </button>
-            </div>
           </nav>
         </div>
       </div>
-      
-      <Dialog open={showAuth} onOpenChange={setShowAuth}>
-        <Dialog.Content className="sm:max-w-md">
-          <Dialog.Header>
-            <Dialog.Title>{isLogin ? "Sign In" : "Sign Up"}</Dialog.Title>
-          </Dialog.Header>
-          <Auth initialMode={isLogin} />
-        </Dialog.Content>
-      </Dialog>
     </header>
   );
 }

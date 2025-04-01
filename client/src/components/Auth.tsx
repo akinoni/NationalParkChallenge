@@ -7,8 +7,8 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-export default function Auth({ initialMode = true }) {
-  const [isLogin, setIsLogin] = useState(initialMode);
+export default function Auth() {
+  const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
     username: "",
