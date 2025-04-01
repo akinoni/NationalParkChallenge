@@ -24,18 +24,25 @@ export default function Leaderboard({ parks, voteCount }: LeaderboardProps) {
       <div className="divide-y divide-gray-100">
         {topParks.map((park) => (
           <div key={park.id} className="p-4 flex items-center space-x-3 hover:bg-gray-50">
-            <div className="flex-shrink-0 w-8 text-center font-bold text-gray-500">{park.currentRank}.</div>
+            <div className="flex-shrink-0 w-8 text-center font-bold text-gray-500">{park.currentRank || 0}.</div>
             <div className="flex-shrink-0 w-6 h-6">
-              {park.previousRank && park.currentRank < park.previousRank ? (
+              {park.previousRank && park.currentRank && park.currentRank < park.previousRank ? (
                 <ArrowUp className="h-5 w-5 text-green-500" />
-              ) : park.previousRank && park.currentRank > park.previousRank ? (
+              ) : park.previousRank && park.currentRank && park.currentRank > park.previousRank ? (
                 <ArrowDown className="h-5 w-5 text-red-500" />
               ) : (
                 <CircleDot className="h-5 w-5 text-gray-400" />
               )}
             </div>
             <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-              {/* Image placeholder */}
+              {park.image && (
+                <img 
+                  src={park.image}
+                  alt={park.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-gray-900 truncate">{park.name}</p>
@@ -43,12 +50,12 @@ export default function Leaderboard({ parks, voteCount }: LeaderboardProps) {
             </div>
             <div className="text-right">
               <p className="text-sm font-medium text-gray-900">{park.elo}</p>
-              {park.previousRank && park.currentRank < park.previousRank ? (
+              {park.previousRank && park.currentRank && park.currentRank < park.previousRank ? (
                 <p className="text-xs text-green-600 flex items-center justify-end">
                   <ArrowUp className="h-3 w-3 mr-1" />
                   {park.previousRank - park.currentRank}
                 </p>
-              ) : park.previousRank && park.currentRank > park.previousRank ? (
+              ) : park.previousRank && park.currentRank && park.currentRank > park.previousRank ? (
                 <p className="text-xs text-red-600 flex items-center justify-end">
                   <ArrowDown className="h-3 w-3 mr-1" />
                   {park.currentRank - park.previousRank}
@@ -65,14 +72,15 @@ export default function Leaderboard({ parks, voteCount }: LeaderboardProps) {
       </div>
       
       <CardContent className="p-4 border-t">
-        <Link href="/rankings">
-          <a className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center">
-            View all rankings
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
-        </Link>
+        <div 
+          className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center cursor-pointer"
+          onClick={() => window.location.href = "/rankings"}
+        >
+          View all rankings
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
       </CardContent>
     </Card>
   );

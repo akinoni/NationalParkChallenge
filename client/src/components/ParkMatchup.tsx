@@ -68,7 +68,19 @@ export default function ParkMatchup({ park1, park2, onVoteSubmitted }: ParkMatch
       {/* Park 1 */}
       <Card className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 ${selectedParkId === park1.id ? 'border-2 border-green-500' : ''}`}>
         <div className="relative h-48">
-          <div className="absolute inset-0 bg-gray-200" />
+          <div className="absolute inset-0 bg-gray-200">
+            {park1.image && (
+              <img 
+                src={park1.image}
+                alt={park1.name}
+                className="w-full h-full object-cover"
+                onError={(e) => { 
+                  // Use default background if image fails to load
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            )}
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-4 left-4 right-4">
             {park1.tag && (
@@ -117,7 +129,19 @@ export default function ParkMatchup({ park1, park2, onVoteSubmitted }: ParkMatch
       {/* Park 2 */}
       <Card className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 ${selectedParkId === park2.id ? 'border-2 border-green-500' : ''}`}>
         <div className="relative h-48">
-          <div className="absolute inset-0 bg-gray-200" />
+          <div className="absolute inset-0 bg-gray-200">
+            {park2.image && (
+              <img 
+                src={park2.image}
+                alt={park2.name}
+                className="w-full h-full object-cover"
+                onError={(e) => { 
+                  // Use default background if image fails to load
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            )}
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-4 left-4 right-4">
             {park2.tag && (

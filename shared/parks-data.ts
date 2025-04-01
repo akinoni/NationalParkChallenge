@@ -1,5 +1,6 @@
 import { InsertPark } from "@shared/schema";
 import { storage } from "../server/storage";
+import { fetchWikipediaParks } from './fetch-wiki-parks';
 
 // ELO calculation function shared between client and server
 export function calculateElo(
@@ -26,45 +27,13 @@ export function calculateElo(
   };
 }
 
-// Initial data for national parks
-const nationalParksData: InsertPark[] = [
-  {
-    name: "Great Smoky Mountains",
-    state: "Tennessee/North Carolina",
-    description: "Ridge upon ridge of forest straddling the border between North Carolina and Tennessee.",
-    image: "great_smoky_mountains.jpg",
-    visitors: 14161548,
-    established: 1934,
-    size: 522427,
-    tag: "#1 Most Visited",
-    elo: 1500
-  },
-  {
-    name: "Grand Canyon",
-    state: "Arizona",
-    description: "Immense canyon carved by the Colorado River over millions of years.",
-    image: "grand_canyon.jpg",
-    visitors: 4532677,
-    established: 1919,
-    size: 1217403,
-    tag: "Popular",
-    elo: 1500
-  },
-  {
-    name: "Zion",
-    state: "Utah",
-    description: "Deep red canyon walls and sandstone cliffs in southwestern Utah.",
-    image: "zion.jpg",
-    visitors: 4257704,
-    established: 1919,
-    size: 147237,
-    elo: 1500
-  },
+// Default data in case Wikipedia fetch fails
+const defaultParksData: InsertPark[] = [
   {
     name: "Yellowstone",
     state: "Wyoming/Montana/Idaho",
     description: "World's first national park, known for geysers and diverse wildlife.",
-    image: "yellowstone.jpg",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Yellowstone_River_in_Hayden_Valley_07-10-09_114.jpg/320px-Yellowstone_River_in_Hayden_Valley_07-10-09_114.jpg",
     visitors: 4115000,
     established: 1872,
     size: 2219791,
@@ -75,129 +44,50 @@ const nationalParksData: InsertPark[] = [
     name: "Yosemite",
     state: "California",
     description: "Granite cliffs, waterfalls, giant sequoias, and diverse wildlife.",
-    image: "yosemite.jpg",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Tunnel_View%2C_Yosemite_Valley%2C_Yosemite_NP_-_Diliff.jpg/320px-Tunnel_View%2C_Yosemite_Valley%2C_Yosemite_NP_-_Diliff.jpg",
     visitors: 3667550,
     established: 1890,
     size: 759620,
-    elo: 1500
-  },
-  {
-    name: "Acadia",
-    state: "Maine",
-    description: "Rocky headlands, woodland, lakes and mountains on the Atlantic coast.",
-    image: "acadia.jpg",
-    visitors: 3537575,
-    established: 1919,
-    size: 49075,
-    elo: 1500
-  },
-  {
-    name: "Olympic",
-    state: "Washington",
-    description: "Diverse ecosystems from glacier-capped mountains to old-growth temperate rainforests.",
-    image: "olympic.jpg",
-    visitors: 2718925,
-    established: 1938,
-    size: 922650,
-    elo: 1500
-  },
-  {
-    name: "Joshua Tree",
-    state: "California",
-    description: "Rugged mountains, gold mining ruins, desert landscape, and the Joshua Tree.",
-    image: "joshua_tree.jpg",
-    visitors: 2590624,
-    established: 1994,
-    size: 790636,
-    elo: 1500
-  },
-  {
-    name: "Bryce Canyon",
-    state: "Utah",
-    description: "Crimson-colored hoodoos (spire-shaped rock formations) in a natural amphitheater.",
-    image: "bryce_canyon.jpg",
-    visitors: 2365110,
-    established: 1928,
-    size: 35835,
-    elo: 1500
-  },
-  {
-    name: "Rocky Mountain",
-    state: "Colorado",
-    description: "Spectacular mountain environments and alpine lakes.",
-    image: "rocky_mountain.jpg",
-    visitors: 4137075,
-    established: 1915,
-    size: 265461,
-    elo: 1500
-  },
-  {
-    name: "Arches",
-    state: "Utah",
-    description: "Over 2,000 natural stone arches, including the famous Delicate Arch.",
-    image: "arches.jpg",
-    visitors: 1675632,
-    established: 1971,
-    size: 76679,
-    elo: 1500
-  },
-  {
-    name: "Glacier",
-    state: "Montana",
-    description: "Pristine forests, alpine meadows, rugged mountains, and spectacular lakes.",
-    image: "glacier.jpg",
-    visitors: 2946681,
-    established: 1910,
-    size: 1013322,
-    elo: 1500
-  },
-  {
-    name: "Shenandoah",
-    state: "Virginia",
-    description: "Part of the Blue Ridge Mountains along the Skyline Drive.",
-    image: "shenandoah.jpg",
-    visitors: 1395401,
-    established: 1935,
-    size: 199173,
-    elo: 1500
-  },
-  {
-    name: "Sequoia",
-    state: "California",
-    description: "Home to the giant sequoia trees, including the General Sherman Tree.",
-    image: "sequoia.jpg",
-    visitors: 1059548,
-    established: 1890,
-    size: 404064,
-    elo: 1500
-  },
-  {
-    name: "Death Valley",
-    state: "California/Nevada",
-    description: "Hottest, driest and lowest national park with diverse landscapes.",
-    image: "death_valley.jpg",
-    visitors: 1111025,
-    established: 1994,
-    size: 3373063,
-    tag: "Lowest Point in North America",
     elo: 1500
   }
 ];
 
 // Function to initialize parks data in the storage
-export function initializeParksData() {
-  fetch('/api/rankings')
-    .then(response => {
-      // If we get empty data or an error, initialize the parks data
-      if (!response.ok) {
-        // Access the storage directly to initialize parks
-        if ("initializeParks" in storage) {
-          (storage as any).initializeParks(nationalParksData);
-        }
+export async function initializeParksData() {
+  try {
+    // First check if we already have data
+    const response = await fetch('/api/rankings');
+    
+    // If rankings are already populated, no need to re-initialize
+    if (response.ok) {
+      const data = await response.json();
+      if (data.length > 0) {
+        console.log('Parks data already initialized with', data.length, 'parks');
+        return;
       }
-    })
-    .catch(() => {
-      // If there's an error (likely because the backend isn't ready yet), 
-      // we'll let the backend handle initialization
-    });
+    }
+
+    console.log('Fetching parks data from Wikipedia...');
+    
+    // Try to fetch park data from Wikipedia
+    let parksData: InsertPark[] = [];
+    
+    try {
+      parksData = await fetchWikipediaParks();
+      console.log(`Successfully fetched ${parksData.length} parks from Wikipedia`);
+    } catch (error) {
+      console.error('Error fetching from Wikipedia, using default data:', error);
+      parksData = defaultParksData;
+    }
+    
+    // Initialize parks with the data we got (either from Wikipedia or default)
+    if ("initializeParks" in storage && parksData.length > 0) {
+      console.log(`Initializing storage with ${parksData.length} parks`);
+      (storage as any).initializeParks(parksData);
+    } else {
+      console.error('Failed to initialize parks data');
+    }
+  } catch (error) {
+    console.error('Error during parks initialization:', error);
+  }
 }

@@ -3,8 +3,44 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
 import { insertVoteSchema } from "@shared/schema";
+import { fetchWikipediaParks } from "@shared/fetch-wiki-parks";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize parks data from Wikipedia when server starts
+  try {
+    console.log("Initializing parks data from Wikipedia...");
+    const parksData = await fetchWikipediaParks();
+    storage.initializeParks(parksData);
+    console.log(`Successfully initialized ${parksData.length} parks`);
+  } catch (error) {
+    console.error("Error initializing parks data:", error);
+    // Initialize with default data if Wikipedia fetch fails
+    const defaultParksData = [
+      {
+        name: "Yellowstone",
+        state: "Wyoming/Montana/Idaho",
+        description: "World's first national park, known for geysers and diverse wildlife.",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Yellowstone_River_in_Hayden_Valley_07-10-09_114.jpg/320px-Yellowstone_River_in_Hayden_Valley_07-10-09_114.jpg",
+        visitors: 4115000,
+        established: 1872,
+        size: 2219791,
+        tag: "First National Park",
+        elo: 1500
+      },
+      {
+        name: "Yosemite",
+        state: "California",
+        description: "Granite cliffs, waterfalls, giant sequoias, and diverse wildlife.",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Tunnel_View%2C_Yosemite_Valley%2C_Yosemite_NP_-_Diliff.jpg/320px-Tunnel_View%2C_Yosemite_Valley%2C_Yosemite_NP_-_Diliff.jpg",
+        visitors: 3667550,
+        established: 1890,
+        size: 759620,
+        elo: 1500
+      }
+    ];
+    storage.initializeParks(defaultParksData);
+    console.log(`Initialized with ${defaultParksData.length} default parks`);
+  }
   // Get a random matchup of two parks
   app.get("/api/matchup", async (req, res) => {
     try {

@@ -32,7 +32,14 @@ export default function RecentVotes() {
               <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-                    {/* Image placeholder */}
+                    {vote.image && (
+                      <img 
+                        src={vote.image}
+                        alt={vote.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    )}
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">{vote.name}</p>
@@ -50,7 +57,14 @@ export default function RecentVotes() {
                     <p className="text-xs text-gray-500 text-right">{vote.timeSince}</p>
                   </div>
                   <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-                    {/* Image placeholder */}
+                    {vote.loserImage && (
+                      <img 
+                        src={vote.loserImage}
+                        alt={vote.loserName || 'Losing park'}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    )}
                   </div>
                 </div>
               </div>

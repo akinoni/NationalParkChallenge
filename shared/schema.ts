@@ -13,8 +13,8 @@ export const parks = pgTable("parks", {
   size: integer("size").notNull(),
   tag: text("tag"),
   elo: integer("elo").notNull().default(1500),
-  previousRank: integer("previous_rank"),
-  currentRank: integer("current_rank"),
+  previousRank: integer("previous_rank").notNull().default(0),
+  currentRank: integer("current_rank").notNull().default(0),
 });
 
 export const votes = pgTable("votes", {
@@ -48,4 +48,5 @@ export type ParkWithVoteInfo = Park & {
   loserName?: string;
   timeSince?: string;
   rankChange?: number;
+  points?: number;
 };
