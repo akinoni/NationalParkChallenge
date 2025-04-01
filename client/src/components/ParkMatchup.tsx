@@ -6,6 +6,7 @@ import { ThumbsUp, Check } from "lucide-react";
 import { Park } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 
 interface ParkMatchupProps {
   park1: Park;
@@ -16,14 +17,22 @@ interface ParkMatchupProps {
 export default function ParkMatchup({ park1, park2, onVoteSubmitted }: ParkMatchupProps) {
   const [selectedParkId, setSelectedParkId] = useState<number | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const submitVoteMutation = useMutation({
     mutationFn: async ({ winnerId, loserId }: { winnerId: number; loserId: number }) => {
-      await apiRequest('POST', '/api/vote', {
+      const voteData: any = {
         winnerParkId: winnerId,
         loserParkId: loserId,
         points: 0 // Points will be calculated on the server
-      });
+      };
+      
+      // Add user ID if user is logged in
+      if (user) {
+        voteData.userId = user.id;
+      }
+      
+      await apiRequest('POST', '/api/vote', voteData);
     },
     onSuccess: () => {
       toast({

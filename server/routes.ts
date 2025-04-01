@@ -2,13 +2,10 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
-import bcrypt from "bcryptjs";
-import { users } from "@shared/schema";
-import { db } from "./db";
-import { eq } from "drizzle-orm";
 import { insertVoteSchema } from "@shared/schema";
 import { fetchWikipediaParks } from "@shared/fetch-wiki-parks";
 import { db } from "./db";
+import { setupAuth } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize parks data from Wikipedia when server starts
@@ -169,44 +166,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   });
-
-  // Submit a vote
-  app.post("/api/signup", async (req, res) => {
-    try {
-      const { email, username, password } = req.body;
-      const passwordHash = await bcrypt.hash(password, 10);
-      
-      const newUser = await db.insert(users).values({
-        email,
-        username,
-        passwordHash
-      }).returning();
-
-      res.status(201).json({ message: "User created successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Error creating user" });
-    }
-  });
-
-  app.post("/api/login", async (req, res) => {
-    try {
-      const { email, password } = req.body;
-      const user = await db.select().from(users).where(eq(users.email, email)).limit(1);
-      
-      if (!user.length) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      const validPassword = await bcrypt.compare(password, user[0].passwordHash);
-      if (!validPassword) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      res.json({ message: "Logged in successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Error logging in" });
-    }
-  });
+  
+  // Setup authentication
+  setupAuth(app);
 
   app.post("/api/vote", async (req, res) => {
     try {

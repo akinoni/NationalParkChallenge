@@ -1,4 +1,4 @@
-import { parks, votes, type Park, type InsertPark, type Vote, type InsertVote, type ParkWithVoteInfo } from "@shared/schema";
+import { parks, votes, users, type Park, type InsertPark, type Vote, type InsertVote, type ParkWithVoteInfo, type User, type InsertUser } from "@shared/schema";
 import { calculateElo } from "../shared/parks-data";
 import { db } from "./db";
 import { eq, desc, sql, and } from "drizzle-orm";
@@ -12,9 +12,14 @@ export interface IStorage {
   updateParkRanks(): Promise<void>;
   
   // Vote operations
-  createVote(vote: InsertVote): Promise<Vote>;
+  createVote(vote: InsertVote & { userId?: number }): Promise<Vote>;
   getRecentVotes(limit: number): Promise<ParkWithVoteInfo[]>;
   getVoteCount(): Promise<number>;
+  
+  // User operations
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(userData: Omit<InsertUser, 'confirmPassword'> & { passwordHash: string }): Promise<User>;
   
   // Only for MemStorage (not in DB implementation)
   initializeParks?(parksData: InsertPark[]): void;
@@ -23,12 +28,16 @@ export interface IStorage {
 export class MemStorage implements IStorage {
   private parks: Map<number, Park>;
   private votes: Vote[];
+  private users: Map<number, User>;
   private voteId: number;
+  private userId: number;
 
   constructor() {
     this.parks = new Map();
     this.votes = [];
+    this.users = new Map();
     this.voteId = 1;
+    this.userId = 1;
   }
 
   async getAllParks(): Promise<Park[]> {
@@ -81,10 +90,11 @@ export class MemStorage implements IStorage {
     }
   }
 
-  async createVote(vote: InsertVote): Promise<Vote> {
+  async createVote(vote: InsertVote & { userId?: number }): Promise<Vote> {
     const newVote: Vote = {
       ...vote,
       id: this.voteId++,
+      userId: vote.userId || null,
       createdAt: new Date()
     };
     
@@ -155,6 +165,28 @@ export class MemStorage implements IStorage {
     if (interval > 1) return Math.floor(interval) + " mins ago";
     
     return Math.floor(seconds) + " secs ago";
+  }
+
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => user.username === username);
+  }
+
+  async createUser(userData: Omit<InsertUser, 'confirmPassword'> & { passwordHash: string }): Promise<User> {
+    const { username, email, passwordHash } = userData;
+    const newUser: User = {
+      id: this.userId++,
+      username,
+      email,
+      passwordHash,
+      createdAt: new Date()
+    };
+    this.users.set(newUser.id, newUser);
+    return newUser;
   }
 
   initializeParks(parksData: InsertPark[]): void {
@@ -266,11 +298,16 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
-  async createVote(vote: InsertVote): Promise<Vote> {
+  async createVote(vote: InsertVote & { userId?: number }): Promise<Vote> {
     // Create a new vote
+    const voteData = {
+      ...vote,
+      userId: vote.userId || null
+    };
+    
     const [newVote] = await db
       .insert(votes)
-      .values(vote)
+      .values(voteData)
       .returning();
       
     // Get the winner and loser parks
@@ -344,6 +381,31 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async createUser(userData: Omit<InsertUser, 'confirmPassword'> & { passwordHash: string }): Promise<User> {
+    const { username, email, passwordHash } = userData;
+    const [user] = await db
+      .insert(users)
+      .values({
+        username,
+        email,
+        passwordHash,
+        createdAt: new Date()
+      })
+      .returning();
+    return user;
+  }
+
   // Method to initialize database with parks data
   async initializeDbWithParks(parksData: InsertPark[]): Promise<void> {
     // Only proceed if we have parks data to insert

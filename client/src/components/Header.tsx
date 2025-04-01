@@ -1,38 +1,87 @@
-import { Link, useLocation } from "wouter";
-import { Sparkles } from "lucide-react";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Loader2, User } from "lucide-react";
 
 export default function Header() {
-  const [location] = useLocation();
+  const { user, isLoading, logoutMutation } = useAuth();
 
   return (
-    <header className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => window.location.href = "/"}>
-            <Sparkles className="h-8 w-8 text-green-500" />
-            <h1 className="text-xl font-bold text-gray-900">ParkRank</h1>
-          </div>
-          <nav className="flex items-center space-x-4">
-            <div 
-              className={`px-3 py-2 text-sm font-medium cursor-pointer ${location === "/about" ? "text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
-              onClick={() => window.location.href = "/about"}
-            >
-              About
-            </div>
-            <div 
-              className={`px-3 py-2 text-sm font-medium cursor-pointer ${location === "/rankings" ? "text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
-              onClick={() => window.location.href = "/rankings"}
-            >
-              Rankings
-            </div>
-            <div 
-              className={`bg-green-500 text-white hover:bg-green-600 px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${location === "/" ? "bg-green-600" : ""}`}
-              onClick={() => window.location.href = "/"}
-            >
-              Vote Now
-            </div>
-          </nav>
-        </div>
+    <header className="bg-primary/10 border-b">
+      <div className="container mx-auto flex justify-between items-center py-4">
+        <Link href="/">
+          <span className="text-xl font-bold hover:text-primary transition-colors cursor-pointer">
+            National Parks ELO
+          </span>
+        </Link>
+        
+        <nav>
+          <ul className="flex space-x-6 items-center">
+            <li>
+              <Link href="/">
+                <span className="hover:text-primary transition-colors cursor-pointer">Home</span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/rankings">
+                <span className="hover:text-primary transition-colors cursor-pointer">Rankings</span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/about">
+                <span className="hover:text-primary transition-colors cursor-pointer">About</span>
+              </Link>
+            </li>
+            
+            {isLoading ? (
+              <li>
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </li>
+            ) : user ? (
+              <li>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {user.username.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{user.username}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onSelect={() => logoutMutation.mutate()}>
+                      {logoutMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Signing out...
+                        </>
+                      ) : (
+                        "Sign out"
+                      )}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </li>
+            ) : (
+              <li>
+                <Link href="/auth">
+                  <span>
+                    <Button>Sign In</Button>
+                  </span>
+                </Link>
+              </li>
+            )}
+          </ul>
+        </nav>
       </div>
     </header>
   );
