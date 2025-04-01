@@ -4,16 +4,42 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { insertVoteSchema } from "@shared/schema";
 import { fetchWikipediaParks } from "@shared/fetch-wiki-parks";
+import { db } from "./db";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize parks data from Wikipedia when server starts
   try {
     console.log("Initializing parks data from Wikipedia...");
+    
+    // Force clear existing database entries to prevent duplicates
+    if ('initializeDbWithParks' in storage) {
+      console.log("Cleaning existing database entries...");
+      await (storage as any).cleanupDatabase();
+    }
+    
+    // Fetch parks data from Wikipedia
     const parksData = await fetchWikipediaParks();
-    storage.initializeParks(parksData);
-    console.log(`Successfully initialized ${parksData.length} parks`);
+    
+    if (parksData.length > 0) {
+      // Initialize with parks if we got data from Wikipedia
+      console.log(`Found ${parksData.length} parks from Wikipedia, initializing database...`);
+      
+      // Check if we're using DatabaseStorage (which has an initializeDbWithParks method)
+      if ('initializeDbWithParks' in storage) {
+        await (storage as any).initializeDbWithParks(parksData);
+      } 
+      // Fallback to in-memory storage if DatabaseStorage not available
+      else if ('initializeParks' in storage) {
+        (storage as any).initializeParks(parksData);
+      }
+      
+      console.log(`Successfully initialized ${parksData.length} parks from Wikipedia`);
+    } else {
+      throw new Error("No parks data returned from Wikipedia");
+    }
   } catch (error) {
     console.error("Error initializing parks data:", error);
+    
     // Initialize with default data if Wikipedia fetch fails
     const defaultParksData = [
       {
@@ -36,10 +62,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
         established: 1890,
         size: 759620,
         elo: 1500
+      },
+      {
+        name: "Grand Canyon",
+        state: "Arizona",
+        description: "Immense canyon carved by the Colorado River, revealing billions of years of geological history.",
+        image: "https://upload.wikimedia.org/wikipedia/commons/f/f9/Grand_Canyon_view_from_Pima_Point_2010.jpg",
+        visitors: 4532677,
+        established: 1919,
+        size: 1201647,
+        elo: 1500
+      },
+      {
+        name: "Zion",
+        state: "Utah",
+        description: "Steep red cliffs, emerald pools, and waterfalls in a desert landscape.",
+        image: "https://upload.wikimedia.org/wikipedia/commons/9/9e/Angels_Landing.jpg",
+        visitors: 4320033,
+        established: 1919,
+        size: 146597,
+        elo: 1500
+      },
+      {
+        name: "Great Smoky Mountains",
+        state: "Tennessee/North Carolina",
+        description: "Ancient mountains with diverse forests, wildflowers, and abundant wildlife.",
+        image: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Foothills_Parkway_View.jpg",
+        visitors: 11421200,
+        established: 1934,
+        size: 522427,
+        tag: "Most Visited", 
+        elo: 1500
       }
     ];
-    storage.initializeParks(defaultParksData);
-    console.log(`Initialized with ${defaultParksData.length} default parks`);
+    
+    console.log(`Initializing with ${defaultParksData.length} default parks...`);
+    
+    // Check if we're using DatabaseStorage (which has an initializeDbWithParks method)
+    if ('initializeDbWithParks' in storage) {
+      await (storage as any).initializeDbWithParks(defaultParksData);
+    } 
+    // Fallback to in-memory storage if DatabaseStorage not available
+    else if ('initializeParks' in storage) {
+      (storage as any).initializeParks(defaultParksData);
+    }
+    
+    console.log(`Initialized with default parks data`);
   }
   // Get a random matchup of two parks
   app.get("/api/matchup", async (req, res) => {
