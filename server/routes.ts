@@ -172,8 +172,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/vote", async (req, res) => {
     try {
+      // Parse the vote data but also allow userId to be included
       const voteData = insertVoteSchema.parse(req.body);
-      const newVote = await storage.createVote(voteData);
+      
+      // Get the userId from authenticated user or from request body
+      let userId = req.body.userId;
+      
+      // If the user is authenticated, use their ID (overrides any ID in the request)
+      if (req.isAuthenticated() && req.user) {
+        userId = req.user.id;
+      }
+      
+      // Pass the vote data with optional userId to storage
+      const newVote = await storage.createVote({ ...voteData, userId });
+      
       res.status(201).json(newVote);
     } catch (error) {
       if (error instanceof z.ZodError) {
